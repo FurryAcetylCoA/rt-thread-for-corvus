@@ -66,6 +66,11 @@ int main(int argc, char **argv) {
                 break;
         }
 
+        rt_kprintf("[TB] cycle time=%llu state=%u r=%u next=%u g_bus=%u (%s)\n",
+                   static_cast<unsigned long long>(ctx->time()), state, r, next,
+                   static_cast<unsigned>(g_bus(dut.get())),
+                   ctx_str);
+
         tick(dut.get(), ctx.get());
         state = next;
 
