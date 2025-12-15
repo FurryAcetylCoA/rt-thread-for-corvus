@@ -1,10 +1,34 @@
 from building import *
 
-cwd     = GetCurrentDir()
-src = Glob('*.c') + Glob('*.cpp')
-CPPPATH = [cwd]
+cwd = GetCurrentDir()
 
-group = DefineGroup('Applications', src, depend = [''], CPPPATH = CPPPATH)
+# Application sources
+src = Glob('*.c') + Glob('*.cpp')
+
+# Verilated DUT and runtime support
+verilated_dut_dir = os.path.join(cwd, 'verilated_dut_162')
+verilator_rt_dir = os.path.join(cwd, 'verilator_runtime')
+
+# Only pull in the bits of the Verilated runtime we need for a single-threaded,
+# non-tracing simulation on RT-Thread.
+verilator_runtime_src = [
+    os.path.join('verilator_runtime', name)
+    for name in [
+        'verilated.cpp',
+        'verilated_random.cpp',
+        'verilated_threads.cpp',
+    ]
+]
+
+src += Glob(os.path.join('verilated_dut_162', '*.cpp'))
+src += [File(path) for path in verilator_runtime_src]
+
+CPPPATH = [cwd, verilated_dut_dir, verilator_rt_dir]
+CPPDEFINES = ['VL_RT_THREAD']
+
+group = DefineGroup(
+    'Applications', src, depend=[''], CPPPATH=CPPPATH, CPPDEFINES=CPPDEFINES
+)
 
 objs = [group]
 
