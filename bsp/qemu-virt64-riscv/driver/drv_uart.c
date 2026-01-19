@@ -26,7 +26,7 @@ struct device_uart
     rt_uint32_t irqno;
 };
 
-void *uart0_base = (void*)0x10000000;
+void *uart0_base = (void*)0x310b0000;
 struct rt_serial_device serial0;
 struct device_uart uart0;
 
@@ -40,7 +40,7 @@ void uart_init(void)
     // LSB
     write8_uart0(0, div & 0xff);
     // MSB
-    write8_uart0(1, (div >> 8) & 0xff);
+    write8_uart0((1 << 2), (div >> 8) & 0xff);
 
     // set word length to 8 bits, no parity
     write8_uart0(UART_LCR, UART_LCR_EIGHT_BITS);

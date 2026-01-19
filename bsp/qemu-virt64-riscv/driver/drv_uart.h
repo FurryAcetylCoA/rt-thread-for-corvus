@@ -22,26 +22,26 @@
 #define UART_THR 0
 
 /* INTERRUPT ENABLE REGISTER */
-#define UART_IER 1
+#define UART_IER (1 << 2)
 #define UART_IER_RX_ENABLE (1 << 0)
 #define UART_IER_TX_ENABLE (1 << 1)
 
 /* FIFO CONTROL REGISTER */
-#define UART_FCR 2
+#define UART_FCR (2 << 2)
 #define UART_FCR_FIFO_ENABLE (1 << 0)
 #define UART_FCR_FIFO_CLEAR (3 << 1)
 
 /* INTERRUPT STATUS REGISTER */
-#define UART_ISR 2
+#define UART_ISR (2 << 2)
 
 /* LINE CONTROL REGISTER */
-#define UART_LCR 3
+#define UART_LCR (3 << 2)
 #define UART_LCR_EIGHT_BITS (3 << 0)
 // special mode to set baud rate
 #define UART_LCR_BAUD_LATCH (1 << 7)
 
 /* LINE STATUS REGISTER */
-#define UART_LSR 5
+#define UART_LSR (5 << 2)
 // input is waiting to be read from RHR
 #define UART_LSR_RX_READY (1 << 0)
 // THR can accept another character to send

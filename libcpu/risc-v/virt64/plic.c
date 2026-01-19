@@ -26,7 +26,7 @@
 #define rt_ioremap(addr, ...) (addr)
 #endif
 
-size_t plic_base = 0x0c000000L;
+size_t plic_base = 0x3c000000L;
 
 /*
  * Each PLIC interrupt source can be assigned a priority by writing

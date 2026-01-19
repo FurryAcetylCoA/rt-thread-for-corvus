@@ -120,15 +120,13 @@
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 256
 #define RT_CONSOLE_DEVICE_NAME "uart0"
-#define RT_VER_NUM 0x50201
-#define RT_USING_STDC_ATOMIC
+#define RT_VER_NUM 0x50300
 #define RT_BACKTRACE_LEVEL_MAX_NR 32
 /* end of RT-Thread Kernel */
 #define ARCH_CPU_64BIT
 #define RT_USING_CACHE
 #define ARCH_MM_MMU
 #define ARCH_RISCV
-#define ARCH_RISCV_FPU
 #define ARCH_RISCV64
 #define ARCH_USING_NEW_CTX_SWITCH
 #define ARCH_USING_RISCV_COMMON64
@@ -138,7 +136,7 @@
 
 #define RT_USING_COMPONENTS_INIT
 #define RT_USING_USER_MAIN
-#define RT_MAIN_THREAD_STACK_SIZE 16384
+#define RT_MAIN_THREAD_STACK_SIZE 8388608
 #define RT_MAIN_THREAD_PRIORITY 10
 #define RT_USING_MSH
 #define RT_USING_FINSH
@@ -201,15 +199,6 @@
 #define RT_USING_RANDOM
 #define RT_USING_RTC
 #define RT_USING_SOFT_RTC
-#define RT_USING_VIRTIO
-#define RT_USING_VIRTIO10
-#define RT_USING_VIRTIO_BLK
-#define RT_USING_VIRTIO_NET
-#define RT_USING_VIRTIO_CONSOLE
-#define RT_USING_VIRTIO_CONSOLE_PORT_MAX_NR 4
-#define RT_USING_VIRTIO_GPU
-#define RT_USING_VIRTIO_INPUT
-#define RT_USING_PIN
 #define RT_USING_KTIME
 /* end of Device Drivers */
 
@@ -235,6 +224,7 @@
 #define RT_USING_POSIX_SELECT
 #define RT_USING_POSIX_TERMIOS
 #define RT_USING_POSIX_AIO
+#define RT_USING_POSIX_MMAN
 #define RT_USING_POSIX_DELAY
 #define RT_USING_POSIX_CLOCK
 #define RT_USING_POSIX_TIMER
@@ -248,6 +238,8 @@
 
 /* end of Interprocess Communication (IPC) */
 /* end of POSIX (Portable Operating System Interface) layer */
+#define RT_USING_CPLUSPLUS
+#define RT_USING_CPP_WRAPPER
 /* end of C/C++ and POSIX layer */
 
 /* Network */
@@ -320,6 +312,10 @@
 
 /* Utilities */
 
+#define RT_USING_UTEST
+#define UTEST_THR_STACK_SIZE 4096
+#define UTEST_THR_PRIORITY 20
+#define RT_UTEST_MAX_OPTIONS 64
 #define RT_USING_RESOURCE_ID
 #define RT_USING_ADT
 #define RT_USING_ADT_AVL
@@ -550,15 +546,8 @@
 
 /* RISC-V QEMU virt64 configs */
 
-#define BSP_USING_VIRTIO
-#define BSP_USING_VIRTIO_BLK
-#define BSP_USING_VIRTIO_NET
-#define BSP_USING_VIRTIO_CONSOLE
-#define BSP_USING_VIRTIO_GPU
-#define BSP_USING_VIRTIO_INPUT
 /* end of RISC-V QEMU virt64 configs */
 #define BOARD_QEMU_VIRT_RV64
-#define ENABLE_FPU
 #define __STACKSIZE__ 16384
 
 #endif
