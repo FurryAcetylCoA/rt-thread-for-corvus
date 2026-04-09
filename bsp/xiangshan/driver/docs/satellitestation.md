@@ -57,10 +57,10 @@ uint64_t sat_recv(int ch);
 
 ---
 
-### 4. `sat_bufferCnt`
+### 4. `sat_receiveBufferCnt`
 **函数原型:**
 ```c
-uint64_t sat_bufferCnt(int ch);
+uint64_t sat_receiveBufferCnt(int ch);
 ```
 
 **功能描述:**
@@ -74,7 +74,24 @@ uint64_t sat_bufferCnt(int ch);
 
 ---
 
-### 5. `sat_clearBuffer`
+### 5. `sat_sendBufferCnt`
+**函数原型:**
+```c
+uint64_t sat_sendBufferCnt(int ch);
+```
+
+**功能描述:**
+获取指定发送通道当前已经排队、尚未被 corvus 侧取走的消息数量。
+
+**参数:**
+- `ch`: 通道编号（必须小于系统定义的最大状态总线数目 `nStateBus`）。
+
+**返回值:**
+返回该通道发送缓冲区中的消息计数。
+
+---
+
+### 6. `sat_clearBuffer`
 **函数原型:**
 ```c
 void sat_clearBuffer(int ch);
@@ -88,7 +105,7 @@ void sat_clearBuffer(int ch);
 
 ---
 
-### 6. `sat_set_outSyncFlag`
+### 7. `sat_set_outSyncFlag`
 **函数原型:**
 ```c
 void sat_set_outSyncFlag(uint64_t flag);
@@ -102,7 +119,7 @@ void sat_set_outSyncFlag(uint64_t flag);
 
 ---
 
-### 7. `sat_get_inSyncFlag`
+### 8. `sat_get_inSyncFlag`
 **函数原型:**
 ```c
 uint64_t sat_get_inSyncFlag(void);
@@ -116,7 +133,7 @@ uint64_t sat_get_inSyncFlag(void);
 
 ---
 
-### 8. `sat_interrupt_install`
+### 9. `sat_interrupt_install`
 **函数原型:**
 ```c
 rt_isr_handler_t sat_interrupt_install(rt_isr_handler_t handler, void* param);
@@ -134,3 +151,10 @@ rt_isr_handler_t sat_interrupt_install(rt_isr_handler_t handler, void* param);
 
 **返回值:**
 如果在重新安装时有旧版本中断回调，返回旧的中断处理函数指针。
+
+## 地址映射说明
+
+- 只读状态区大小为 `pow2ceil(1 + 2 * nStateBus)` 个 64-bit 寄存器。
+- 偏移 0 为 `inSyncFlag`。
+- 偏移 1 到 `nStateBus` 为接收方向 `toCoreStateBusBuffer[i].count`。
+- 偏移 `1 + nStateBus` 到 `2 * nStateBus` 为发送方向 `fromCoreStateBusBuffer[i].count`。

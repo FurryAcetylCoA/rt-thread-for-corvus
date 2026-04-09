@@ -29,14 +29,19 @@ uint64_t sat_recv(int ch) {
     return SAT_MSG_PAYLOAD(msg);
 }
 
-uint64_t sat_bufferCnt(int ch) {
+uint64_t sat_receiveBufferCnt(int ch) {
     RT_ASSERT(ch < nStateBus);
-    return readq_relaxed((void*)(SAT_RS(ch + 1)));
+    return readq_relaxed((void*)(SAT_TOCORE_COUNT(ch)));
+}
+
+uint64_t sat_sendBufferCnt(int ch) {
+    RT_ASSERT(ch < nStateBus);
+    return readq_relaxed((void*)(SAT_FROMCORE_COUNT(ch)));
 }
 
 void sat_clearBuffer(int ch) {
     RT_ASSERT(ch < nStateBus);
-    while (sat_bufferCnt(ch) > 0) {
+    while (sat_receiveBufferCnt(ch) > 0) {
         sat_recv(ch);
     }
 }

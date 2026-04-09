@@ -47,8 +47,8 @@ static void sat_recv_handler(int vector, void *param){
     if(vector != 5) {rt_kprintf("WHAT?\n"); return;}
     rt_kprintf("\nThis is reciver handler\n");
 
-    rt_kprintf("cnt is %lld\n", sat_bufferCnt(0));
-    while (sat_bufferCnt(0) > 0) {
+    rt_kprintf("cnt is %lld\n", sat_receiveBufferCnt(0));
+    while (sat_receiveBufferCnt(0) > 0) {
         rt_kprintf("payload is 0x%llX\n",sat_recv(0));
     }
     rt_kprintf("DONE\n");

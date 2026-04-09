@@ -26,7 +26,7 @@ static inline unsigned int sat_pow2ceil(unsigned int v) {
     return v;
 }
 
-#define SAT_N_RS (sat_pow2ceil(1 + nStateBus))
+#define SAT_N_RS (sat_pow2ceil(1 + 2 * nStateBus))
 #define SAT_N_WS 2
 #define SAT_N_RQ nStateBus
 #define SAT_N_WQ nStateBus
@@ -36,10 +36,11 @@ static inline unsigned int sat_pow2ceil(unsigned int v) {
 #define SAT_RQ_BASE (SAT_WS_BASE + SAT_N_WS * 8)
 #define SAT_WQ_BASE (SAT_RQ_BASE + SAT_N_RQ * 8)
 
-/// Read only Control Registers, 0 to pow2ceil(1 + nStateBus) bytes
+/// Read only control registers.
 /// 0: inSyncFlag
-/// 1~ nStateBus: Receive buffer count
-///  ~ pow2ceil(1 + nStateBus): 0
+/// 1 ~ nStateBus: toCore receive queue count
+/// 1 + nStateBus ~ 2 * nStateBus: fromCore send queue count
+/// Remaining entries up to SAT_N_RS are 0.
 #define SAT_RS(offset) (SAT_RS_BASE + (offset) * 8)
 /// Writable Control Registers, 0 to 2
 /// 0: outSyncFlag
@@ -52,6 +53,9 @@ static inline unsigned int sat_pow2ceil(unsigned int v) {
 /// Each for a StateBus
 #define SAT_WQ(offset) (SAT_WQ_BASE + (offset) * 8)
 
+#define SAT_TOCORE_COUNT(offset)   SAT_RS(1 + (offset))
+#define SAT_FROMCORE_COUNT(offset) SAT_RS(1 + nStateBus + (offset))
+
 #define SAT_inSyncFlag()  SAT_RS(0)
 #define SAT_outSyncFlag() SAT_WS(0)
 #define SAT_nodeId()      SAT_WS(1)
@@ -62,7 +66,10 @@ void sat_init(void);
 void sat_send(int ch, uint16_t target, uint64_t payload);
 /// Get a payload from StateBus `n`. Block when empty
 uint64_t sat_recv(int ch);
-uint64_t sat_bufferCnt(int ch);
+/// Get queued receive packet count for StateBus `n`.
+uint64_t sat_receiveBufferCnt(int ch);
+/// Get queued send packet count for StateBus `n`.
+uint64_t sat_sendBufferCnt(int ch);
 void sat_clearBuffer(int ch);
 void sat_set_outSyncFlag(uint64_t flag);
 uint64_t sat_get_inSyncFlag();
