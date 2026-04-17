@@ -9,6 +9,17 @@
 #define SAT_MSG_DST(msg)     (((msg) >> 48) & 0xFFFF)
 #define SAT_MSG_PAYLOAD(msg) ((msg) & 0xFFFFFFFFFFFFULL)
 
+static void sat_assert_valid_channel(int ch)
+{
+    RT_ASSERT(ch >= 0);
+    RT_ASSERT((unsigned int)ch < sat_localStateBusCount());
+}
+
+unsigned int sat_localStateBusCount(void)
+{
+    return __raw_hartid() == 0 ? nMBus : nStateBus;
+}
+
 
 void sat_init(void) {
     // Don't use rt_hw_cpu_id()
@@ -17,30 +28,30 @@ void sat_init(void) {
 }
 
 void sat_send(int ch, uint16_t target, uint64_t payload) {
-    RT_ASSERT(ch < nStateBus);
+    sat_assert_valid_channel(ch);
     uint64_t msg = SAT_MSG_PACK(target, payload);
     writeq_relaxed(msg, (void*)(SAT_WQ(ch)));
 }
 
 uint64_t sat_recv(int ch) {
-    RT_ASSERT(ch < nStateBus);
+    sat_assert_valid_channel(ch);
     uint64_t msg = readq_relaxed((void*)(SAT_RQ(ch)));
     //RT_ASSERT(readq_relaxed((void*)SAT_nodeId()) == SAT_MSG_DST(msg)); // Seems not necessary
     return SAT_MSG_PAYLOAD(msg);
 }
 
 uint64_t sat_receiveBufferCnt(int ch) {
-    RT_ASSERT(ch < nStateBus);
+    sat_assert_valid_channel(ch);
     return readq_relaxed((void*)(SAT_TOCORE_COUNT(ch)));
 }
 
 uint64_t sat_sendBufferCnt(int ch) {
-    RT_ASSERT(ch < nStateBus);
+    sat_assert_valid_channel(ch);
     return readq_relaxed((void*)(SAT_FROMCORE_COUNT(ch)));
 }
 
 void sat_clearBuffer(int ch) {
-    RT_ASSERT(ch < nStateBus);
+    sat_assert_valid_channel(ch);
     while (sat_receiveBufferCnt(ch) > 0) {
         sat_recv(ch);
     }

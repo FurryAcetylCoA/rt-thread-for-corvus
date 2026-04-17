@@ -4,6 +4,19 @@
 
 这些 API 提供了一组接口，用于初始化卫星站、发送和接收消息、管理接收缓冲区、以及配置同步标志和中断。
 
+当前硬件把 StateBus 分成两类：
+
+- `MBus`：会经过 master station 和全部 satellite station。
+- `SBus`：只会经过全部 satellite station，不经过 master station。
+
+默认配置下，`nMBus = 2`、`nSBus = 2`、`nStateBus = 4`。对 satellite hart，`0 ..< nMBus` 是 MBus 通道，`nMBus ..< nStateBus` 是 SBus 通道；对 master hart，只能看到本地 `nMBus` 条 MBus 通道。
+
+头文件还提供：
+
+- `sat_localStateBusCount()`：返回当前 hart 本地可见的 StateBus 数量。
+- `SAT_MBUS_CH(offset)`：把第 `offset` 条 MBus 映射到本地通道号。
+- `SAT_SBUS_CH(offset)`：把第 `offset` 条 SBus 映射到 satellite hart 的本地通道号。
+
 ## 头文件
 请在使用前包含相应的头文件：
 ```c
@@ -34,7 +47,7 @@ void sat_send(int ch, uint16_t target, uint64_t payload);
 通过指定通道发送消息给目标节点。
 
 **参数:**
-- `ch`: 发送通道编号（必须小于系统定义的最大状态总线数目 `nStateBus`）。
+- `ch`: 发送通道编号（必须小于当前 hart 本地可见的状态总线数目 `sat_localStateBusCount()`）。
 - `target`: 目标节点的 ID。
 - `payload`: 要发送的数据，低 48 bit 有效。
 
@@ -50,7 +63,7 @@ uint64_t sat_recv(int ch);
 从指定通道接收一条消息的有效载荷。
 
 **参数:**
-- `ch`: 接收通道编号（必须小于系统定义的最大状态总线数目 `nStateBus`）。
+- `ch`: 接收通道编号（必须小于当前 hart 本地可见的状态总线数目 `sat_localStateBusCount()`）。
 
 **返回值:**
 返回接收到的 48 bit 数据，右对其。读取后即出队。
@@ -67,7 +80,7 @@ uint64_t sat_receiveBufferCnt(int ch);
 获取指定接收通道的缓冲区内现存未读的消息数量。
 
 **参数:**
-- `ch`: 通道编号（必须小于系统定义的最大状态总线数目 `nStateBus`）。
+- `ch`: 通道编号（必须小于当前 hart 本地可见的状态总线数目 `sat_localStateBusCount()`）。
 
 **返回值:**
 返回该通道接收缓冲区中的消息计数。
@@ -84,7 +97,7 @@ uint64_t sat_sendBufferCnt(int ch);
 获取指定发送通道当前已经排队、尚未被 corvus 侧取走的消息数量。
 
 **参数:**
-- `ch`: 通道编号（必须小于系统定义的最大状态总线数目 `nStateBus`）。
+- `ch`: 通道编号（必须小于当前 hart 本地可见的状态总线数目 `sat_localStateBusCount()`）。
 
 **返回值:**
 返回该通道发送缓冲区中的消息计数。
@@ -101,7 +114,7 @@ void sat_clearBuffer(int ch);
 清空指定接收通道的缓冲区。该函数会循环拉取所有缓冲中的消息直到队列为空。
 
 **参数:**
-- `ch`: 通道编号（必须小于系统定义的最大状态总线数目 `nStateBus`）。
+- `ch`: 通道编号（必须小于当前 hart 本地可见的状态总线数目 `sat_localStateBusCount()`）。
 
 ---
 
@@ -154,7 +167,7 @@ rt_isr_handler_t sat_interrupt_install(rt_isr_handler_t handler, void* param);
 
 ## 地址映射说明
 
-- 只读状态区大小为 `pow2ceil(1 + 2 * nStateBus)` 个 64-bit 寄存器。
+- 只读状态区大小为 `pow2ceil(1 + 2 * sat_localStateBusCount())` 个 64-bit 寄存器。
 - 偏移 0 为 `inSyncFlag`。
-- 偏移 1 到 `nStateBus` 为接收方向 `toCoreStateBusBuffer[i].count`。
-- 偏移 `1 + nStateBus` 到 `2 * nStateBus` 为发送方向 `fromCoreStateBusBuffer[i].count`。
+- 偏移 1 到 `sat_localStateBusCount()` 为接收方向 `toCoreStateBusBuffer[i].count`。
+- 偏移 `1 + sat_localStateBusCount()` 到 `2 * sat_localStateBusCount()` 为发送方向 `fromCoreStateBusBuffer[i].count`。
